@@ -14,34 +14,6 @@ var flatObj = {
   'obj.field': '1.0'
 };
 
-var marshaller = new Marshaller(function () {
-
-  this.cmap('stringified_array', this.toJSON, 'unstringified');
-  this.mmap('a', function (key, self) {
-    var r = {}, i;
-    for (i in self.aa) {
-      r[key + '.' + i] = self.aa[i];
-    }
-    return r;
-  });
-  this.map('obj.field', ['obj', 'field_orig']);
-
-});
-
-var treeObj = // marshaller.marshal(flatObj);
-{
-  simple_str: 'simple', // as is
-  unstringified: ['simple', 'array'],
-  aa: ['item second', 'item first'], // in order of sorted keys
-  ab: {
-    '1': 'item first',
-    '0': 'item second'
-  },
-  obj: {
-    field_original: '1.0',
-    field_scalar: 1
-  }
-};
 var unmarshaller = new Unmarshaller(function () {
 
   this.map('simple_str'); // redundant, it's a default
@@ -60,7 +32,36 @@ var unmarshaller = new Unmarshaller(function () {
   this.tcmap(/obj\..+/, parseInt, this.dotsplit);
 });
 
-var result = // unmarshaller.unmarshal(treeObj);
+var treeObj = // unmarshaller.unmarshal(flatObj);
+{
+  simple_str: 'simple', // as is
+  unstringified: ['simple', 'array'],
+  aa: ['item second', 'item first'], // in order of sorted keys
+  ab: {
+    '1': 'item first',
+    '0': 'item second'
+  },
+  obj: {
+    field_original: '1.0',
+    field_scalar: 1
+  }
+};
+
+var marshaller = new Marshaller(function () {
+
+  this.cmap('stringified_array', this.toJSON, 'unstringified');
+  this.mmap('a', function (key, self) {
+    var r = {}, i;
+    for (i in self.aa) {
+      r[key + '.' + i] = self.aa[i];
+    }
+    return r;
+  });
+  this.map('obj.field', ['obj', 'field_orig']);
+
+});
+
+var result = // marshaller.marshal(treeObj);
 {
   simple_str: 'simple',
   stringified_array: 'simple,array',
