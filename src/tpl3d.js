@@ -21,15 +21,15 @@
     /**
      * Taken from jQuery sources.
      */
-    typeOf: function (obj) {
-      return (obj == null)
+    typeOf: function typeOf(obj) {
+      return (obj == null) // ignore warnings about non-strict comparison here
             ? String( obj )
             : $.tpl3d.class2type[ Object.prototype.toString.call( obj ) ] || "object";
     },
 
     // PUBLIC:
 
-    Marshaller: function (options) {
+    Marshaller: function Marshaller(options) {
 
       this.mappings = [];
       this.taken = [];
@@ -38,7 +38,7 @@
       options.init.call(this);
     },
 
-    Unmarshaller: function (options) {
+    Unmarshaller: function Unmarshaller(options) {
 
       this.mappings = [];
       this.taken = [];
@@ -48,7 +48,7 @@
       options.init.call(this);
     },
 
-    MappingFrom: function(from, conv, to) {
+    MappingFrom: function MappingFrom(from, conv, to) {
       this.from = from;
       this.conv = conv;
       this.to = to;
@@ -64,7 +64,7 @@
     var classes = ['Boolean', 'Number', 'String', 'Function', 'Array',
                    'Date', 'RegExp', 'Object', 'Error'];
     var i;
-    for (i in classes) {
+    for (i = 0; i < classes.length; i++) {
       c2t[ "[object " + classes[i] + "]" ] = classes[i].toLowerCase();
     }
   }( $.tpl3d.class2type ));
@@ -72,13 +72,13 @@
   /*
    * Unmarshaller
    */
-  $.tpl3d.Unmarshaller.prototype.map = function (from, to) {
+  $.tpl3d.Unmarshaller.prototype.map = function map(from, to) {
 
     to = to || from;
     this.mappings.push(new $.tpl3d.MappingFrom(from, null, to));
   };
 
-  $.tpl3d.Unmarshaller.prototype.unmarshal = function (obj) {
+  $.tpl3d.Unmarshaller.prototype.unmarshal = function unmarshal(obj) {
 
     var out = {};
 
@@ -91,7 +91,7 @@
     }
 
     var i;
-    for (i in this.mappings) {
+    for (i = 0; i < this.mappings.length; i++) {
       var m = this.mappings[i];
 
       if (typeof m.from === 'string') {
@@ -102,7 +102,7 @@
       } else if ($.tpl3d.typeOf(m.from) === 'regexp') {
 
         var j, fromArray = [];
-        for (j in this.available) {
+        for (j = 0; j < this.available.length; j++) {
           if (m.from.test( this.available[j] )) {
             fromArray.push( this.available[j] );
             this.taken.push( this.available[j] );
@@ -117,8 +117,9 @@
 
       } else if (typeof m.to === 'function') {
 
-        for (i in m.from) {
-          var keySeq = m.to(m.from[i]);
+        var h;
+        for (h = 0; h < m.from.length; h++) {
+          var keySeq = m.to(m.from[h]);
           var levelObj = out;
           var k;
 
@@ -129,7 +130,7 @@
             }
             levelObj = levelObj[ key ];
           }
-          levelObj[ keySeq[ keySeq.length - 1 ] ] = obj[ m.from[i] ];
+          levelObj[ keySeq[ keySeq.length - 1 ] ] = obj[ m.from[h] ];
         }
       }
     }
@@ -139,13 +140,13 @@
   /*
    * Marshaller
    */
-  $.tpl3d.Marshaller.prototype.map = function (to, from) {
+  $.tpl3d.Marshaller.prototype.map = function map(to, from) {
 
     from = from || to;
     //TODO: start here
   };
 
-  $.tpl3d.Marshaller.prototype.marshal = function (obj) {
+  $.tpl3d.Marshaller.prototype.marshal = function marshal(obj) {
 
   };
 
