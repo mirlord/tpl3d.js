@@ -9,8 +9,17 @@
  *
  */
 
-(function ($) {
+(function (undefined) {
   'use strict';
+
+  var $;
+
+  // to make easy to use it with jQuery & jQuery-csv
+  if (typeof jQuery !== 'undefined' && jQuery) {
+    $ = jQuery;
+  } else {
+    $ = {};
+  }
 
   $.tpl3d = {
 
@@ -150,5 +159,13 @@
 
   };
 
-}( jQuery ));
+  // CommonJS module is defined
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = $.tpl3d;
+  } else if (this) {
+    // in a browser this should point to a window
+    this['tpl3d'] = $.tpl3d;
+  }
+
+}).call( this );
 
