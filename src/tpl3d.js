@@ -58,9 +58,15 @@
     },
 
     MappingFrom: function MappingFrom(from, conv, to) {
-      this.from = from;
-      this.conv = conv;
-      this.to = to;
+      this.m_from = from;
+      this.m_conv = conv;
+      this.m_to = to;
+    },
+
+    MappingTo: function MappingFrom(to, conv, from) {
+      this.m_to = to;
+      this.m_conv = conv;
+      this.m_from = from;
     },
 
     helpers: {
@@ -79,12 +85,36 @@
   }( $.tpl3d.class2type ));
 
   /*
+   * Mappings
+   */
+  $.tpl3d.MappingFrom.prototype.to = function to(toValue) {
+    this.m_to = toValue;
+    return this;
+  };
+
+  $.tpl3d.MappingFrom.prototype.conv = function conv(convFn) {
+    this.m_conv = convFn;
+    return this;
+  };
+
+  $.tpl3d.MappingTo.prototype.from = function from(fromValue) {
+    this.m_from = fromValue;
+    return this;
+  };
+
+  $.tpl3d.MappingTo.prototype.conv = function conv(convFn) {
+    this.m_conv = convFn;
+    return this;
+  };
+
+  /*
    * Unmarshaller
    */
-  $.tpl3d.Unmarshaller.prototype.map = function map(from, to) {
+  $.tpl3d.Unmarshaller.prototype.map = function map(from) {
 
-    to = to || from;
-    this.mappings.push(new $.tpl3d.MappingFrom(from, null, to));
+    var mapping = new $.tpl3d.MappingFrom(from, null, from);
+    this.mappings.push(mapping);
+    return mapping;
   };
 
   $.tpl3d.Unmarshaller.prototype.unmarshal = function unmarshal(obj) {
@@ -103,32 +133,32 @@
     for (i = 0; i < this.mappings.length; i++) {
       var m = this.mappings[i];
 
-      if (typeof m.from === 'string') {
+      if (typeof m.m_from === 'string') {
 
-        m.from = [ m.from ];
-        this.taken.push(m.from);
+        m.m_from = [ m.m_from ];
+        this.taken.push(m.m_from);
 
-      } else if ($.tpl3d.typeOf(m.from) === 'regexp') {
+      } else if ($.tpl3d.typeOf(m.m_from) === 'regexp') {
 
         var j, fromArray = [];
         for (j = 0; j < this.available.length; j++) {
-          if (m.from.test( this.available[j] )) {
+          if (m.m_from.test( this.available[j] )) {
             fromArray.push( this.available[j] );
             this.taken.push( this.available[j] );
           }
         }
-        m.from = fromArray;
+        m.m_from = fromArray;
       }
 
-      if (typeof m.to === 'string') {
+      if (typeof m.m_to === 'string') {
 
-        out[m.to] = obj[ m.from[0] ];
+        out[m.m_to] = obj[ m.m_from[0] ];
 
-      } else if (typeof m.to === 'function') {
+      } else if (typeof m.m_to === 'function') {
 
         var h;
-        for (h = 0; h < m.from.length; h++) {
-          var keySeq = m.to(m.from[h]);
+        for (h = 0; h < m.m_from.length; h++) {
+          var keySeq = m.m_to(m.m_from[h]);
           var levelObj = out;
           var k;
 
@@ -139,7 +169,7 @@
             }
             levelObj = levelObj[ key ];
           }
-          levelObj[ keySeq[ keySeq.length - 1 ] ] = obj[ m.from[h] ];
+          levelObj[ keySeq[ keySeq.length - 1 ] ] = obj[ m.m_from[h] ];
         }
       }
     }
@@ -149,14 +179,45 @@
   /*
    * Marshaller
    */
-  $.tpl3d.Marshaller.prototype.map = function map(to, from) {
+  $.tpl3d.Marshaller.prototype.map = function map(to) {
 
-    from = from || to;
-    //TODO: start here
+    var mapping = new $.tpl3d.MappingTo(to, null, to);
+    this.mappings.push(mapping);
+    return mapping;
+  };
+
+  $.tpl3d.Marshaller.prototype.marshalAll = function marshalAll(objArray) {
+
+    var out = [],
+        i;
+    for (i = 0; i < objArray.length; i++) {
+      out.push(this.marshal(objArray[i]));
+    }
+    return out;
   };
 
   $.tpl3d.Marshaller.prototype.marshal = function marshal(obj) {
 
+    var out = {};
+
+    var i;
+    for (i = 0; i < this.mappings.length; i++) {
+      var m = this.mappings[i];
+      if (typeof m.m_from === 'string') {
+        out[m.m_to] = obj[m.m_from];
+        if (m.m_conv) {
+          out[m.m_to] = m.m_conv.call(undefined, out[m.m_to]);
+        }
+      } else if (typeof m.m_from === 'array') {
+        throw new Error('Not implemented yet');
+      } else if (typeof m.m_from === 'function') {
+        out[m.m_to] = m.m_from.call(undefined, obj);
+      } else {
+        throw new Error('Incorrect mapping');
+      }
+    }
+
+    return out;
   };
 
   // CommonJS module is defined
