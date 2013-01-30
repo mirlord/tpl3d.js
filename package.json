@@ -9,6 +9,7 @@
   "dependencies": {
   },
   "devDependencies": {
+    "tap": ">= 0.4",
     "grunt": ">= 0"
   },
   "main": "src/tpl3d.js",
