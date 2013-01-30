@@ -214,3 +214,24 @@ var marshaller = new tpl3d.Marshaller(function () {
 var thesame = marshaller.marshal(unmarshaller.unmarshal(testobj));
 ```
 
+## Tests
+
+To run tests:
+
+```bash
+$ git clone git@github:mirlord/tpl3d.js
+$ npm install
+$ make tap
+```
+
+## TODO
+
+* Samples are good. API-docs are better.
+* Better check what user does and be informative on his failures.
+
+## LICENSE
+
+[The MIT License](http://www.opensource.org/licenses/mit-license.php)
+
+Copyright (c) 2012 Vladimir Chizhov <master@mirlord.com>
+
