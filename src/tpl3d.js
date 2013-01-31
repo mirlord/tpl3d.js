@@ -211,7 +211,6 @@
       var toValues = m.resolveTo();
       assignMultiple(out, toValues, fromValues);
     }
-    console.error(out);
     return out;
   };
 
@@ -289,7 +288,6 @@
         throw new Error('Incorrect mapping to: ' + m.m_to);
       }
     }
-    console.error(out);
     return out;
   };
 
