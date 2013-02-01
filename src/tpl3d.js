@@ -102,12 +102,15 @@
 
   $.tpl3d.MappingFrom.prototype.resolveFrom = function resolveFrom(obj, available) {
 
-    var result = [];
+    var result = {
+      keys:   [],
+      values: []
+    };
 
     if (typeof this.m_from === 'string') {
 
-      result.push( this.doConv(obj[this.m_from]) );
-      this.m_from = [this.m_from];
+      result.values.push( this.doConv(obj[this.m_from]) );
+      result.keys.push(this.m_from);
 
     } else if (typeOf(this.m_from) === 'regexp') {
 
@@ -116,17 +119,16 @@
       for (j = 0; j < available.length; j++) {
         prop = available[j];
         if (this.m_from.test(prop)) {
-          result.push( this.doConv(obj[prop]) );
-          fromArray.push(prop);
+          result.values.push( this.doConv(obj[prop]) );
+          result.keys.push(prop);
         }
       }
-      this.m_from = fromArray;
     }
 
     return result;
   };
 
-  $.tpl3d.MappingFrom.prototype.resolveTo = function resolveTo(obj) {
+  $.tpl3d.MappingFrom.prototype.resolveTo = function resolveTo(keys) {
 
     var result = [];
     if (typeof this.m_to === 'string') {
@@ -140,8 +142,8 @@
     } else if (typeof this.m_to === 'function') {
 
       var i, r;
-      for (i = 0; i < this.m_from.length; i++) {
-        r = this.m_to(this.m_from[i]);
+      for (i = 0; i < keys.length; i++) {
+        r = this.m_to(keys[i]);
         if (typeOf(r) === 'array') {
           result.push(r);
         } else {
@@ -207,9 +209,9 @@
     for (i = 0; i < this.mappings.length; i++) {
 
       var m = this.mappings[i];
-      var fromValues = m.resolveFrom(obj, available);
-      var toValues = m.resolveTo();
-      assignMultiple(out, toValues, fromValues);
+      var mappedValues = m.resolveFrom(obj, available);
+      var toValues = m.resolveTo(mappedValues.keys);
+      assignMultiple(out, toValues, mappedValues.values);
     }
     return out;
   };
