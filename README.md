@@ -229,6 +229,9 @@ var marshaller = new tpl3d.Marshaller(function () {
 var objects = [{/* object 1 */}, {/* object 2 */}, {/* object 3 */}];
 
 var data = csv.fromObjects(objects, {
+  /*
+   * That's it! A `transform` hook.
+   */
   transform: function (o) {
     marshaller.marshal(o);
   }
@@ -239,6 +242,9 @@ var unmarshaller = new tpl3d.Unmarshaller(function () {
 });
 
 objects = csv.toObjects(data, {
+  /*
+   * That's it! A `transform` hook.
+   */
   transform: function (o) {
     unmarshaller.unmarshal(o);
   }
