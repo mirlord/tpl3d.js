@@ -214,6 +214,37 @@ var marshaller = new tpl3d.Marshaller(function () {
 var thesame = marshaller.marshal(unmarshaller.unmarshal(testobj));
 ```
 
+## How to use it with jquery-csv
+
+jquery-csv offers you useful hooks, that are perfect for integration with tpl3d:
+
+```javascript
+var csv   = require('jquery-csv');
+var tpl3d = require('tpl3d');
+
+var marshaller = new tpl3d.Marshaller(function () {
+  // ...
+});
+
+var objects = [{/* object 1 */}, {/* object 2 */}, {/* object 3 */}];
+
+var data = csv.fromObjects(objects, {
+  transform: function (o) {
+    marshaller.marshal(o);
+  }
+});
+
+var unmarshaller = new tpl3d.Unmarshaller(function () {
+  // ...
+});
+
+objects = csv.toObjects(data, {
+  transform: function (o) {
+    unmarshaller.unmarshal(o);
+  }
+});
+```
+
 ## Tests
 
 To run tests:
